@@ -1,7 +1,10 @@
 import time
 import os
 from skimage import io
-import LeafRGB
+from LeafRGB import LeafRGB
+
+import collections
+c = collections.Counter()
 
 
 def import_images():
@@ -25,11 +28,12 @@ def import_images():
 images = import_images()
 
 s_time = time.time()
-# images_with_masks = LeafRGB.create_masks(images)
-images_with_masks = LeafRGB.create_masks([images[0]])
 
-for img in images_with_masks:
-    LeafRGB.show_img_info(img)
+for img in images:
+    l = LeafRGB(img)
+    l.show_all()
+
+    break  # trying only 1 image
 
 # print(str(time.time() - s_time) + " for 4 images")
-print(str(time.time() - s_time) + " for 1 image")
+print(str(time.time() - s_time))
