@@ -2,9 +2,7 @@ import time
 import os
 from skimage import io
 from LeafRGB import LeafRGB
-
-import collections
-c = collections.Counter()
+from LeafHSV import LeafHSV
 
 
 def import_images():
@@ -27,13 +25,23 @@ def import_images():
 
 images = import_images()
 
-s_time = time.time()
+
 
 for img in images:
-    l = LeafRGB(img)
-    l.show_all()
+    s_time = time.time()
 
-    break  # trying only 1 image
+    rgb = LeafRGB(img)
+    # rgb.show_all()
+    # print(rgb.green_square)
+    print(str(time.time() - s_time))
+    s_time = time.time()
 
-# print(str(time.time() - s_time) + " for 4 images")
-print(str(time.time() - s_time))
+    hsv = LeafHSV(img)
+    # hsv.show_all()
+    # print(hsv.green_square)
+
+    print(str(time.time() - s_time))
+
+    # break  # trying only 1 image
+
+
