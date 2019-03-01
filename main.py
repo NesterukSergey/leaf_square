@@ -18,7 +18,7 @@ def import_images():
     img_list = []
 
     # Hardcoded filenames
-    filenames_list = ['photo1s.jpg', 'photo2s.jpg', 'photo3s.jpg', 'photo4s.jpg']
+    filenames_list = ['photo6s.jpg', 'photo1s.jpg', 'photo2s.jpg', 'photo3s.jpg', 'photo4s.jpg']
     for filename in filenames_list:
         file = os.path.join('testDataset', filename)
         img_list.append(io.imread(file))
