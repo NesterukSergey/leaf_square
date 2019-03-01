@@ -1,8 +1,11 @@
 import time
 import os
 from skimage import io
+import matplotlib.pyplot as plt
+
 from LeafRGB import LeafRGB
 from LeafHSV import LeafHSV
+from thresholding import show_all_thresholds
 
 
 def import_images():
@@ -25,23 +28,23 @@ def import_images():
 
 images = import_images()
 
-
-
 for img in images:
-    s_time = time.time()
-
-    rgb = LeafRGB(img)
+    # # testing RGB segmentation
+    # s_time = time.time()
+    # rgb = LeafRGB(img)
     # rgb.show_all()
     # print(rgb.green_square)
-    print(str(time.time() - s_time))
-    s_time = time.time()
+    # print(str(time.time() - s_time))
 
-    hsv = LeafHSV(img)
+    # # testing HSV segmentation
+    # s_time = time.time()
+    # hsv = LeafHSV(img)
     # hsv.show_all()
     # print(hsv.green_square)
+    # print(str(time.time() - s_time))
 
-    print(str(time.time() - s_time))
+    show_all_thresholds(img)
 
-    # break  # trying only 1 image
+    break  # trying only 1 image
 
 
