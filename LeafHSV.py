@@ -33,8 +33,8 @@ class LeafHSV:
             Returns:
             bool: True if pixel is green
             '''
-            return np.all([(60 / 360 < pxl[0] < 200 / 360),
-                           (pxl[1] > 0.25)
+            return np.all([(40 / 360 < pxl[0] < 170 / 360),
+                           (55 / 360 < pxl[1])
                            ])
 
         def is_red(pxl):
@@ -93,5 +93,5 @@ class LeafHSV:
 
     def count_squares(self):
         ''' Counts leaf square '''
-        self.pxl_square = 1 / self.red_pixels  # square centimeters
+        self.pxl_square = 1 / (self.red_pixels + 1)  # square centimeters +1 to avoid division by zero
         self.green_square = self.green_pixels * self.pxl_square  # square centimeters

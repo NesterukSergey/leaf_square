@@ -70,10 +70,15 @@ def split_into_9_parts(image):
 
 # images = import_test_images()
 images = import_images('6_plant')
+images.__next__()  # skip one image (it's blurred)
+
 for img in images:
     parts = split_into_9_parts(img)
-    show_image(parts[2])
-    break # trying only 1 image
+    # show_image(parts[2])
+    rgb = LeafHSV(parts[2])
+    show_image(rgb.rgb_image)
+    show_image(rgb.green_mask)
+    break  # trying only 1 image
 
 # for img in images:
 #     # # testing RGB segmentation

@@ -100,6 +100,6 @@ class LeafRGB:
 
     def count_squares(self):
         ''' Counts leaf square '''
-        self.pxl_square = 1 / self.red_pixels  # square centimeters
+        self.pxl_square = 1 / (self.red_pixels + 1)  # square centimeters +1 to avoid zero division
         self.green_square = self.green_pixels * self.pxl_square  # square centimeters
 
