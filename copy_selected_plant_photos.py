@@ -47,4 +47,4 @@ def copy_selected_plant(source_folder, plant_number=6):
     os.chdir(init_folder)
 
 
-copy_selected_plant('all_photos', 6)
+# copy_selected_plant('all_photos', 6)

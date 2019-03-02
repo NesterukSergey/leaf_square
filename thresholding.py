@@ -6,6 +6,7 @@ from skimage.filters import try_all_threshold
 
 
 def show_all_thresholds(img):
+    ''' Tests several thresholds to an image and shows plots '''
     # img = data.page()
     img = rgb2gray(img)
     print(img.shape)
