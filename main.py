@@ -23,9 +23,7 @@ def import_images(folder):
     :return: generator object of numpy.ndarray images
     '''
     assert os.path.exists(folder)
-
     images_path = [f for f in os.listdir(folder) if os.path.splitext(f)[1] == '.jpg']
-
     return (io.imread(os.path.join(folder, img)) for img in images_path)
 
 
@@ -36,7 +34,7 @@ def show_image(image):
 
 def show_hist(h, line=None):
     plt.hist(h)
-    if not line is None:
+    if line is not None:
         plt.axvline(line, color='r')
     plt.show()
 
@@ -93,7 +91,7 @@ def count_pixel_square(img):
     return 1 / one_square
 
 
-def calculate_squares(desk, storage):
+def calculate_squares(desk, storage=None):
     '''
     Adds calculated squares of plants' leafs from the desk to the storage
     |0|1|2|
@@ -102,7 +100,7 @@ def calculate_squares(desk, storage):
 
     :param desk: image of a desk with plants
     :param storage: array
-    :return:
+    :return: array of squares
     '''
     parts = split_into_9_parts(desk)
     pixels_count = []
@@ -116,8 +114,24 @@ def calculate_squares(desk, storage):
 
     squares = [c * pixel_square for c in pixels_count]
 
-    for part in range(7):
-        storage[part].append(squares[part])
+    if desk is not None:
+        for part in range(7):
+            storage[part].append(squares[part])
+
+    return squares
+
+
+def calculate_single_plant(desk, plant_number):
+    '''
+    Calculates square of plants' leafs from one of the desks' parts[0...3, 6..8]
+
+    :param desk:
+    :param plant_number:
+    :return: square
+    '''
+    parts = split_into_9_parts(desk)
+    pixel_square = count_pixel_square(parts[4])
+    return count_green_pixels(parts[plant_number]) * pixel_square
 
 
 images = import_images('6_plant')
@@ -126,21 +140,27 @@ plants_growth = [[] for i in range(7)]
 
 s_time = time.time()
 
-# counter = 50
+# counter = 25
+# for desk in images:
+#     if is_blurred(desk):
+#         continue
+#
+#     calculate_squares(desk, plants_growth)
+#
+#     counter -= 1
+#     if counter < 1:
+#         break
+#
+# for pl in plants_growth:
+#     pl = np.array(pl)
+#     print(pl.mean())
+#
+# show_plots(plants_growth)
+
+single_plant = []
 for desk in images:
-    if is_blurred(desk):
-        continue
+    single_plant.append(calculate_single_plant(desk, 2))
 
-    calculate_squares(desk, plants_growth)
-
-    # counter -= 1
-    # if counter < 1:
-    #     break
-
-for pl in plants_growth:
-    pl = np.array(pl)
-    print(pl.mean())
-
-show_plots(plants_growth)
+show_plots([single_plant])
 
 print(str((time.time() - s_time) / 300) + ' per image')
