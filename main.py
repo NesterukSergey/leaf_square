@@ -7,6 +7,12 @@ from skimage.filters.rank import median
 from skimage.morphology import disk
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
+
+
+def is_blurred(img):
+    variance = cv2.Laplacian(img, cv2.CV_64F).var()
+    return variance < 40
 
 
 def import_images(folder):
@@ -24,7 +30,7 @@ def import_images(folder):
 
 
 def show_image(image):
-    ip = plt.imshow(image)
+    plt.imshow(image)
     plt.show()
 
 
@@ -54,36 +60,35 @@ def split_into_9_parts(image):
     :param image: numpy.ndarray
     :return: list of 9 numpy.ndarrays
     '''
-
     vert = image.shape[0] // 3
     hor = image.shape[1] // 3
-    list = []
+    ls = []
 
     for col in range(3):
         for row in range(3):
-            list.append(image[vert * col: vert * (col + 1),
-                        hor * row: hor * (row + 1)])
+            ls.append(image[vert * col: vert * (col + 1),
+                      hor * row: hor * (row + 1)])
 
-    return list
+    return ls
 
 
 def count_green_pixels(img):
-    # s_time = time.time()
-
     hsv_image = rgb2hsv(img)
     saturation = hsv_image[:, :, 1]
     threshold = threshold_otsu(saturation)
-    saturation = saturation > threshold
-    saturation = median(saturation, disk(2))
+    saturation = saturation > threshold * 1.3
+    saturation = median(saturation, disk(2))  # filtering
 
     # show_image(saturation)
-
-    # print(str(time.time() - s_time))
     pixels_count = saturation.mean() * saturation.shape[0] * saturation.shape[1] / saturation.max()
     return pixels_count
 
 
 def count_pixel_square(img):
+    '''
+    :param img: ndarray, - image with 2 reference squares
+    :return: one pixel square (cm^2)
+    '''
     one_square = count_green_pixels(img) // 2
     return 1 / one_square
 
@@ -116,22 +121,21 @@ def calculate_squares(desk, storage):
 
 
 images = import_images('6_plant')
-images.__next__()  # skip one image (it's blurred)
-# for i in range(250):
-#     images.__next__()
 
 plants_growth = [[] for i in range(7)]
 
-counter = 25
+s_time = time.time()
+
+# counter = 50
 for desk in images:
+    if is_blurred(desk):
+        continue
+
     calculate_squares(desk, plants_growth)
 
-    counter -= 1
-    if counter < 1:
-        break
-
-#     # break  # trying only 1 image
-
+    # counter -= 1
+    # if counter < 1:
+    #     break
 
 for pl in plants_growth:
     pl = np.array(pl)
@@ -139,3 +143,4 @@ for pl in plants_growth:
 
 show_plots(plants_growth)
 
+print(str((time.time() - s_time) / 300) + ' per image')
