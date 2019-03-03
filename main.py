@@ -1,30 +1,12 @@
 import time
 import os
 from skimage import io
+from skimage.color import rgb2hsv
+from skimage.filters import threshold_otsu
+from skimage.filters.rank import median
+from skimage.morphology import disk
+import numpy as np
 import matplotlib.pyplot as plt
-
-from LeafRGB import LeafRGB
-from LeafHSV import LeafHSV
-from thresholding import show_all_thresholds
-
-
-def import_test_images():
-    '''
-    Imports images from "/testDataset/"
-
-    Returns:
-    img_list (list of numpy.ndarrays): the list of images
-    '''
-    img_list = []
-
-    # Hardcoded test filenames
-    filenames_list = ['photo6s.jpg', 'photo1s.jpg', 'photo2s.jpg', 'photo3s.jpg', 'photo4s.jpg']
-
-    for filename in filenames_list:
-        file = os.path.join('testDataset', filename)
-        img_list.append(io.imread(file))
-
-    return img_list
 
 
 def import_images(folder):
@@ -46,6 +28,22 @@ def show_image(image):
     plt.show()
 
 
+def show_hist(h, line=None):
+    plt.hist(h)
+    if not line is None:
+        plt.axvline(line, color='r')
+    plt.show()
+
+
+def show_plots(data):
+    fig = plt.figure(figsize=(10, 10))
+    for plant in range(len(data)):
+        a = fig.add_subplot(len(data), 1, plant + 1)
+        a.plot(data[plant])
+
+    plt.show()
+
+
 def split_into_9_parts(image):
     '''
     Splits image into 9 parts
@@ -56,6 +54,7 @@ def split_into_9_parts(image):
     :param image: numpy.ndarray
     :return: list of 9 numpy.ndarrays
     '''
+
     vert = image.shape[0] // 3
     hor = image.shape[1] // 3
     list = []
@@ -68,33 +67,75 @@ def split_into_9_parts(image):
     return list
 
 
-# images = import_test_images()
+def count_green_pixels(img):
+    # s_time = time.time()
+
+    hsv_image = rgb2hsv(img)
+    saturation = hsv_image[:, :, 1]
+    threshold = threshold_otsu(saturation)
+    saturation = saturation > threshold
+    saturation = median(saturation, disk(2))
+
+    # show_image(saturation)
+
+    # print(str(time.time() - s_time))
+    pixels_count = saturation.mean() * saturation.shape[0] * saturation.shape[1] / saturation.max()
+    return pixels_count
+
+
+def count_pixel_square(img):
+    one_square = count_green_pixels(img) // 2
+    return 1 / one_square
+
+
+def calculate_squares(desk, storage):
+    '''
+    Adds calculated squares of plants' leafs from the desk to the storage
+    |0|1|2|
+    |3| | |
+    |4|5|6| i.e. excluding reference square and empty part
+
+    :param desk: image of a desk with plants
+    :param storage: array
+    :return:
+    '''
+    parts = split_into_9_parts(desk)
+    pixels_count = []
+    pixel_square = count_pixel_square(parts[4])
+
+    for n in range(9):
+        if (n == 4) or (n == 5):  # skipping reference square and empty part
+            continue
+
+        pixels_count.append(count_green_pixels(parts[n]))
+
+    squares = [c * pixel_square for c in pixels_count]
+
+    for part in range(7):
+        storage[part].append(squares[part])
+
+
 images = import_images('6_plant')
 images.__next__()  # skip one image (it's blurred)
+# for i in range(250):
+#     images.__next__()
 
-for img in images:
-    parts = split_into_9_parts(img)
-    # show_image(parts[2])
-    rgb = LeafHSV(parts[2])
-    show_image(rgb.rgb_image)
-    show_image(rgb.green_mask)
-    break  # trying only 1 image
+plants_growth = [[] for i in range(7)]
 
-# for img in images:
-#     # # testing RGB segmentation
-#     # s_time = time.time()
-#     # rgb = LeafRGB(img)
-#     # rgb.show_all()
-#     # print(rgb.green_square)
-#     # print(str(time.time() - s_time))
-#
-#     # # testing HSV segmentation
-#     # s_time = time.time()
-#     # hsv = LeafHSV(img)
-#     # hsv.show_all()
-#     # print(hsv.green_square)
-#     # print(str(time.time() - s_time))
-#
-#     show_all_thresholds(img)
-#
-#     break  # trying only 1 image
+counter = 25
+for desk in images:
+    calculate_squares(desk, plants_growth)
+
+    counter -= 1
+    if counter < 1:
+        break
+
+#     # break  # trying only 1 image
+
+
+for pl in plants_growth:
+    pl = np.array(pl)
+    print(pl.mean())
+
+show_plots(plants_growth)
+
