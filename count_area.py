@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import cv2
 import csv
 import pandas as pd
+import itertools
 
 
 def is_blurred(img):
@@ -19,6 +20,32 @@ def is_blurred(img):
     '''
     variance = cv2.Laplacian(img, cv2.CV_64F).var()
     return variance < 40
+
+
+def remove_blurred(areas, images):
+    '''
+    Replaces area value of blurred images with average of its neighbors
+
+    :param areas: array of (7) arrays for every plant. Each contains areas measurements
+    :param images: generator object
+    :return: areas
+    '''
+    areas_to_remove = []
+    desk_number = 0
+    for desk in images:
+        if is_blurred(desk['image']):
+            areas_to_remove.append(desk_number)
+
+        desk_number += 1
+
+    for plant in range(len(areas)):
+        for area in list(reversed(sorted(areas_to_remove))):
+            if area == 0 or area == (len(areas[plant]) - 1):
+                del areas[plant][area]
+            else:
+                areas[plant][area]['area'] = (areas[plant][area - 1]['area'] + areas[plant][area + 1]['area']) / 2
+
+    return areas
 
 
 def split_into_9_parts(image):
@@ -108,7 +135,8 @@ def read_areas_from_file(plant_number, type='pandas_series'):
         areas_array.pop(0)
         return [float(s) for s in areas_array]
 
-    return pd.read_csv(file, header=0)
+    # return pd.read_csv(file, header=0)
+    return pd.Series.from_csv(file, header=0)
 
 
 def calculate_squares(images, write_to_file=True):
@@ -122,6 +150,7 @@ def calculate_squares(images, write_to_file=True):
     :param write_to_file: boolean, if True data would be written to file
     :return: array of areas
     '''
+    init_images, images = itertools.tee(images)
     plants_growth = [[] for i in range(7)]
     for desk in images:
         parts = split_into_9_parts(desk['image'])
@@ -141,6 +170,8 @@ def calculate_squares(images, write_to_file=True):
                 'time': desk['time'],
                 'area': squares[plant]
             })
+
+    plants_growth = remove_blurred(plants_growth, init_images)
 
     if write_to_file:
         for plant in range(len(plants_growth)):

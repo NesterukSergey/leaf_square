@@ -3,8 +3,14 @@ import os
 from skimage import io
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
 import pandas as pd
+from pandas.plotting import lag_plot
+from pandas.plotting import autocorrelation_plot
+from pandas import DataFrame
+from pandas import concat
+from pandas import Series
+from statsmodels.graphics.tsaplots import plot_acf
+from sklearn.metrics import mean_squared_error
 
 import copy_selected_plant_photos
 import count_area
@@ -43,8 +49,9 @@ def show_plots(data):
 
     plt.show()
 
+
 # Making dataset that consists of images of selected desks with plants
-# copy_selected_plant('all_photos', 6)
+# copy_selected_plant_photos.copy_selected_plant('all_photos', 6)
 
 
 # Importing images from dataset
@@ -60,8 +67,17 @@ def show_plots(data):
 
 
 # Getting raw array with areas of one selected plant
-# show_plots([count_area.read_areas_from_file(2, type='array')])
+# areas = count_area.read_areas_from_file(6, type='array')
+# show_plots([areas])
 
 
-# Getting Pandas.Series with areas of one selected plant
-areas = count_area.read_areas_from_file(2)
+# Plotting all plants
+# a = []
+# for i in range(7):
+#     a.append(count_area.read_areas_from_file(i, type='array'))
+#
+# show_plots(a)
+
+
+
+
