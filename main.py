@@ -11,6 +11,13 @@ from pandas import concat
 from pandas import Series
 from statsmodels.graphics.tsaplots import plot_acf
 from sklearn.metrics import mean_squared_error
+from skimage.filters import threshold_otsu
+from skimage.color import rgb2hsv
+from skimage.morphology import disk
+from skimage.filters.rank import median
+import cv2
+from statsmodels.tsa.ar_model import AR
+from sklearn.metrics import mean_squared_error
 
 import copy_selected_plant_photos
 import count_area
@@ -67,16 +74,23 @@ def show_plots(data):
 
 
 # Getting raw array with areas of one selected plant
-# areas = count_area.read_areas_from_file(6, type='array')
+# areas = count_area.read_areas_from_file(3, type='array')
 # show_plots([areas])
 
 
-# Plotting all plants
-# a = []
-# for i in range(7):
-#     a.append(count_area.read_areas_from_file(i, type='array'))
-#
-# show_plots(a)
+# # Getting Pandas.Series with areas of one selected plant
+# areas = count_area.read_areas_from_file(2)
+# lag_plot(areas)
+# plt.show()
+
+
+series = Series.from_csv('2_plant_areas.csv', header=0)
+
+# prediction.show_autocorrelation(series)
+
+# prediction.show_baseline(series)
+
+
 
 
 
