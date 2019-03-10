@@ -1,4 +1,6 @@
 import os
+import matplotlib.pyplot as plt
+
 
 import count_area
 import prediction
@@ -36,17 +38,45 @@ class Hydroponics:
 
 
 
-emulator = Hydroponics(3)
+# emulator = Hydroponics(3)
+# # print(emulator.emu_data)
+# emulator.add_measurements(285)
+# # print(emulator.emu_data)
+# # print(emulator.all_squares.values[len(emulator.emu_data):len(emulator.emu_data) + emulator.max_predictions])
+# emulator.predict()
+# print(emulator.predictions)
+# print(emulator.mistakes)
+# plt.plot(emulator.emu_data)
+# plt.plot(emulator.predictions)
+# plt.show()
 
 
-# print(emulator.emu_data)
 
-emulator.add_measurements(50)
-# print(emulator.emu_data)
 
-# print(emulator.all_squares.values[len(emulator.emu_data):len(emulator.emu_data) + emulator.max_predictions])
+start = 24
+end = 285
 
-emulator.predict()
-print(emulator.predictions)
-print(emulator.mistakes)
+one = []
+three = []
+six = []
+
+for i in range(start, end):
+    em = Hydroponics(4)
+    em.add_measurements(i)
+    em.predict()
+    o, t, s = em.mistakes
+    one.append(o)
+    three.append(t)
+    six.append(s)
+
+plt.plot([i for i in range(start, end)], one)
+# plt.show()
+
+plt.plot([i for i in range(start, end)], three)
+# plt.show()
+
+plt.plot([i for i in range(start, end)], six)
+plt.show()
+
+
 
