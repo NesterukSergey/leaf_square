@@ -91,24 +91,5 @@ series = Series.from_csv('2_plant_areas.csv', header=0)
 # prediction.show_baseline(series)
 
 
-
-
-# split dataset
-X = series.values
-train, test = X[1:len(X)-30], X[len(X)-30:len(X)-20]
-# train autoregression
-model = AR(train)
-model_fit = model.fit()
-print('Lag: %s' % model_fit.k_ar)
-print('Coefficients: %s' % model_fit.params)
-# make predictions
-predictions = model_fit.predict(start=len(train), end=len(train)+len(test)-1, dynamic=False)
-for i in range(len(predictions)):
-    print('predicted=%f, expected=%f' % (predictions[i], test[i]))
-error = mean_squared_error(test, predictions)
-print('Test MSE: %.3f' % error)
-# plot results
-plt.plot(test)
-plt.plot(predictions, color='red')
-plt.show()
+prediction.make_prediction(series)
 

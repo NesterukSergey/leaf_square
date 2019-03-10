@@ -9,6 +9,8 @@ import cv2
 import csv
 import pandas as pd
 import itertools
+import shutil
+import scipy.misc
 
 
 def is_blurred(img):
@@ -80,11 +82,11 @@ def count_green_pixels(img):
     '''
     hsv_image = rgb2hsv(img)
     saturation = hsv_image[:, :, 1]
+
     threshold = threshold_otsu(saturation)
-    saturation = saturation > threshold * 1.3
+    saturation = saturation > threshold * 0.8
     saturation = median(saturation, disk(2))  # filtering
 
-    # show_image(saturation)
     pixels_count = saturation.mean() * saturation.shape[0] * saturation.shape[1] / saturation.max()
     return pixels_count
 
@@ -163,6 +165,21 @@ def calculate_squares(images, write_to_file=True):
 
             pixels_count.append(count_green_pixels(parts[n]))
 
+            # # saving images and masks to file
+            # m = n
+            # if n >= 4:
+            #     m -= 1
+            #
+            # if n >= 5:
+            #     m -= 1
+            #
+            # mask = make_mask(parts[n])
+            #
+            # scipy.misc.imsave(os.path.join('camera_emulator', str(n + 1) + '_cell', desk['time'] + 'im.jpg'), parts[n])
+            # scipy.misc.imsave(os.path.join('camera_emulator', str(n + 1) + '_cell', desk['time'] + 'mask.jpg'), mask)
+
+
+
         squares = [c * pixel_square for c in pixels_count]
 
         for plant in range(len(squares)):
@@ -203,3 +220,21 @@ def calculate_single_plant(images, plant_number, write_to_file=True):
         write_areas_to_file(area_series, plant_number)
 
     return area_series
+
+
+def make_mask(img):
+    '''
+    Makes a mask that contains green pixels
+
+    :param img: np.ndarray
+    :return: np.ndarray
+    '''
+    hsv_image = rgb2hsv(img)
+    saturation = hsv_image[:, :, 1]
+
+    threshold = threshold_otsu(saturation)
+    saturation = saturation > threshold * 0.8
+    saturation = median(saturation, disk(2))  # filtering
+
+    binary = [[[255, 255, 255] if pxl == 0 else [0, 0, 0] for pxl in row] for row in saturation]
+    return binary

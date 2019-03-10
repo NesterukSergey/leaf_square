@@ -1,0 +1,24 @@
+.one_row {
+    display: flex;
+}
+
+input[type=radio] {
+    margin-left: 10px;
+}
+
+h2 {
+    margin-top: 30px;
+}
+
+#sensors {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 353px;
+}
+
+#sensors_value {
+    margin-top: 20px;
+}
+

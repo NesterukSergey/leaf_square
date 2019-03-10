@@ -65,9 +65,20 @@ def show_autocorrelation(series):
     plt.show()
 
 
+def make_prediction(train, count=12):
+    model = AR(train)
+    model_fit = model.fit()
+    predictions = model_fit.predict(start=len(train), end=len(train) + count - 1, dynamic=False)
+    return predictions
 
 
+def calculate_mistake(predictions, values):
+    assert len(predictions) == len(values) == 12
+    one_h = mean_squared_error(predictions[:2], values[:2])
+    three_h = mean_squared_error(predictions[:6], values[:6])
+    six_h = mean_squared_error(predictions, values)
 
+    return [one_h, three_h, six_h]
 
 
 
